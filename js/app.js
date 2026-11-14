@@ -31,18 +31,26 @@ $$("[data-wa-general]").forEach((a) => {
 // Aisle chips: plain anchor links
 $("#chips").innerHTML = CATEGORIES.map((c) => `<a class="chip" href="#aisle-${c.id}" data-aisle="${c.id}">${esc(c.short)}</a>`).join("");
 
-// Parts cabinet drawers (hero on desktop, sheet on phones)
-$$("[data-cabinet]").forEach((ul) => {
-  ul.innerHTML = CATEGORIES.map((c) => `
-    <li><button class="drawer" type="button" data-drawer="${c.id}" aria-label="${esc(c.name)}, ${countIn(c.id)} products">
-      <span class="drawer__label">${esc(c.short)}</span><span class="drawer__n">${pad(countIn(c.id))}</span>
-      <span class="drawer__handle" aria-hidden="true"></span>
-    </button></li>`).join("");
+// Stock board: one row per aisle (hero on desktop, sheet on phones)
+$$("[data-board]").forEach((ul) => {
+  ul.innerHTML = CATEGORIES.map((c, i) => {
+    const items = PRODUCTS.filter((p) => p.cat === c.id);
+    const from = Math.min(...items.map((p) => p.p[0]));
+    return `
+    <li><button class="row" type="button" data-row="${c.id}" aria-label="${esc(c.name)}, ${items.length} lines, from ${gbp(from)}">
+      <span class="row__n">${pad(i + 1)}</span>
+      <img class="row__img" src="${img(items[0])}" alt="" width="40" height="40" loading="lazy">
+      <span class="row__name">${esc(c.short)}</span>
+      <span class="row__dots" aria-hidden="true"></span>
+      <span class="row__count">${items.length} lines</span>
+      <span class="row__from">from <b>${gbp(from)}</b></span>
+    </button></li>`;
+  }).join("");
   ul.addEventListener("click", (e) => {
-    const b = e.target.closest("[data-drawer]"); if (!b) return;
+    const b = e.target.closest("[data-row]"); if (!b) return;
     $("#aisles-sheet").open && $("#aisles-sheet").close();
     if (state.q || state.use) { state.q = ""; state.use = ""; $("#q").value = ""; syncUses(); render(); }
-    $(`#aisle-${b.dataset.drawer}`)?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
+    $(`#aisle-${b.dataset.row}`)?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
   });
 });
 

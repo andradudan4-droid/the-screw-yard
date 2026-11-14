@@ -73,15 +73,22 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
 .hazard { height: 14px; background: repeating-linear-gradient(-45deg, var(--hivis) 0 18px, var(--ink) 18px 36px); }
 
-/* parts cabinet */
-.cabinet { background: linear-gradient(#3a3832, #24221d); border-radius: 14px; padding: 14px; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), 0 30px 60px -20px rgba(0,0,0,.6); }
-.cabinet__title { margin: 2px 6px 12px; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.55); }
-.cabinet__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.drawer { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 8px; padding: 12px 12px 10px; border: 0; border-radius: 8px; text-align: left; cursor: pointer; color: var(--ink); background: linear-gradient(#f4f1e9, #dcd6c7); box-shadow: inset 0 -4px 0 rgba(0,0,0,.18), 0 2px 0 rgba(0,0,0,.35); transition: transform .18s, box-shadow .18s; }
-.drawer:hover, .drawer:focus-visible { transform: translateY(3px); box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), 0 0 0 3px var(--hivis); outline: none; }
-.drawer__label { background: #fff; border: 1px solid #c9c2b0; border-radius: 3px; padding: 3px 7px; font-weight: 750; font-size: .92rem; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.drawer__n { font-family: var(--f-mono); font-size: .75rem; color: var(--muted); }
-.drawer__handle { grid-column: 1 / -1; justify-self: center; width: 44%; height: 6px; border-radius: 6px; background: linear-gradient(#9da2a8, #6b7077); margin-top: 6px; }
+/* stock board */
+.board { border: 1px solid rgba(255,255,255,.18); border-top: 4px solid var(--hivis); background: rgba(255,255,255,.03); }
+.board__head { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 12px 16px; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.6); }
+.board__rows { list-style: none; margin: 0; padding: 0; }
+.row { width: 100%; display: grid; grid-template-columns: auto 40px auto minmax(12px, 1fr) auto 6.2em; align-items: center; gap: 12px; padding: 7px 16px; border: 0; border-top: 1px solid rgba(255,255,255,.12); background: none; color: #fff; font: inherit; text-align: left; cursor: pointer; transition: background .15s, color .15s; }
+.row__n { font-family: var(--f-mono); font-size: .78rem; color: var(--hivis); }
+.row__img { width: 40px; height: 40px; object-fit: contain; background: #fff; border-radius: 4px; padding: 3px; }
+.row__name { font-weight: 800; font-stretch: 108%; font-size: 1.02rem; white-space: nowrap; }
+.row__dots { height: 0; border-bottom: 2px dotted rgba(255,255,255,.28); transform: translateY(4px); }
+.row__count { font-family: var(--f-mono); font-size: .76rem; color: rgba(255,255,255,.6); white-space: nowrap; }
+.row__from { font-family: var(--f-mono); font-size: .76rem; text-align: right; white-space: nowrap; color: rgba(255,255,255,.6); }
+.row__from b { font-size: .95rem; color: #fff; }
+.row:hover, .row:focus-visible { background: var(--hivis); color: var(--ink); outline: none; }
+.row:hover :is(.row__n, .row__count, .row__from, .row__from b), .row:focus-visible :is(.row__n, .row__count, .row__from, .row__from b) { color: var(--ink); }
+.row:hover .row__dots, .row:focus-visible .row__dots { border-color: rgba(20,19,15,.4); }
+@media (max-width: 480px) { .row { grid-template-columns: auto 40px auto minmax(8px, 1fr) auto; padding-inline: 4px; } .row__count { display: none; } }
 
 /* ---------- yard ---------- */
 .yard { padding: 0 var(--pad) clamp(40px, 6vw, 72px); }
@@ -212,7 +219,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 @media (max-width: 860px) {
   .hero__grid, .order { grid-template-columns: minmax(0, 1fr); }
-  .hero .cabinet { display: none; } /* drawers live in the dock's Aisles sheet on phones */
+  .hero .board { display: none; } /* the board lives in the dock's Aisles sheet on phones */
 }
 @media (max-width: 640px) {
   .sheet { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 16px 16px 0 0; max-height: 92vh; }
