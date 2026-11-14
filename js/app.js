@@ -28,9 +28,7 @@ $$("[data-wa-general]").forEach((a) => {
   a.target = "_blank"; a.rel = "noopener";
 });
 
-// Rail aisles (desktop) + chips (phones): both are plain anchor links
-$("#rail-aisles").innerHTML = CATEGORIES.map((c, i) =>
-  `<li><a href="#aisle-${c.id}" data-aisle="${c.id}"><span class="no">${pad(i + 1)}</span>${esc(c.short)}<span class="n">${countIn(c.id)}</span></a></li>`).join("");
+// Aisle chips: plain anchor links
 $("#chips").innerHTML = CATEGORIES.map((c) => `<a class="chip" href="#aisle-${c.id}" data-aisle="${c.id}">${esc(c.short)}</a>`).join("");
 
 // Parts cabinet drawers (hero on desktop, sheet on phones)
