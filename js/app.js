@@ -1,16 +1,20 @@
 import { BRAND, CATEGORIES, USES, PRODUCTS } from "./data.js";
 
 const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const gbp = (n) => "£" + n.toFixed(2);
+const pad = (n) => String(n).padStart(2, "0");
 const catById = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 const byId = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
 const img = (p) => `/assets/products/${p.id}.webp`;
 const waLink = (text) => `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(text)}`;
+const countIn = (cat) => PRODUCTS.filter((p) => p.cat === cat).length;
+const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const state = { q: "", cat: "", use: "", sort: "cat" };
+const state = { q: "", use: "" };
 
-/* ---------- storage (quote list) ---------- */
+/* ---------- quote list storage ---------- */
 const KEY = "tsy-quote-v1";
 let quote = {};
 try { quote = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch { quote = {}; }
@@ -18,110 +22,111 @@ for (const id of Object.keys(quote)) if (!byId[id]) delete quote[id];
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(quote)); } catch {} };
 
 /* ---------- static bits ---------- */
-document.querySelectorAll("[data-count-products]").forEach((el) => (el.textContent = PRODUCTS.length));
-document.querySelectorAll("[data-wa-general]").forEach((a) => {
+$$("[data-count-products]").forEach((el) => (el.textContent = PRODUCTS.length));
+$$("[data-wa-general]").forEach((a) => {
   a.href = waLink(`Hi ${BRAND.name}, I'd like a price on some fixings.`);
   a.target = "_blank"; a.rel = "noopener";
 });
 
-const countIn = (cat) => PRODUCTS.filter((p) => p.cat === cat).length;
+// Rail aisles (desktop) + chips (phones): both are plain anchor links
+$("#rail-aisles").innerHTML = CATEGORIES.map((c, i) =>
+  `<li><a href="#aisle-${c.id}" data-aisle="${c.id}"><span class="no">${pad(i + 1)}</span>${esc(c.short)}<span class="n">${countIn(c.id)}</span></a></li>`).join("");
+$("#chips").innerHTML = CATEGORIES.map((c) => `<a class="chip" href="#aisle-${c.id}" data-aisle="${c.id}">${esc(c.short)}</a>`).join("");
 
-// Parts cabinet drawers
-$("#cabinet").innerHTML = CATEGORIES.map((c) => `
-  <li><button class="drawer" type="button" data-drawer="${c.id}" aria-label="${esc(c.name)}, ${countIn(c.id)} products">
-    <span class="drawer__label">${esc(c.short)}</span><span class="drawer__n">${String(countIn(c.id)).padStart(2, "0")}</span>
-    <span class="drawer__handle" aria-hidden="true"></span>
-  </button></li>`).join("");
-$("#cabinet").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-drawer]"); if (!b) return;
-  setCat(b.dataset.drawer);
-  $("#catalogue").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+// Parts cabinet drawers (hero on desktop, sheet on phones)
+$$("[data-cabinet]").forEach((ul) => {
+  ul.innerHTML = CATEGORIES.map((c) => `
+    <li><button class="drawer" type="button" data-drawer="${c.id}" aria-label="${esc(c.name)}, ${countIn(c.id)} products">
+      <span class="drawer__label">${esc(c.short)}</span><span class="drawer__n">${pad(countIn(c.id))}</span>
+      <span class="drawer__handle" aria-hidden="true"></span>
+    </button></li>`).join("");
+  ul.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-drawer]"); if (!b) return;
+    $("#aisles-sheet").open && $("#aisles-sheet").close();
+    if (state.q || state.use) { state.q = ""; state.use = ""; $("#q").value = ""; syncUses(); render(); }
+    $(`#aisle-${b.dataset.drawer}`)?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
+  });
 });
 
-// Chips
-$("#chips").innerHTML = [`<button class="chip" type="button" data-cat="" aria-pressed="true">All<small>${PRODUCTS.length}</small></button>`]
-  .concat(CATEGORIES.map((c) => `<button class="chip" type="button" data-cat="${c.id}" aria-pressed="false">${esc(c.short)}<small>${countIn(c.id)}</small></button>`)).join("");
-$("#chips").addEventListener("click", (e) => { const b = e.target.closest("[data-cat]"); if (b) setCat(b.dataset.cat); });
-
-// Uses select
-$("#use").insertAdjacentHTML("beforeend", USES.map((u) => `<option value="${u.id}">${esc(u.label)}</option>`).join(""));
-$("#use").addEventListener("change", (e) => { state.use = e.target.value; render(); });
-$("#sort").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
+// "Fixing into" toggles
+$("#uses").innerHTML = USES.map((u) => `<button class="use" type="button" data-use="${u.id}" aria-pressed="false">${esc(u.label)}</button>`).join("");
+const syncUses = () => $$("#uses .use").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.use === state.use)));
+$("#uses").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-use]"); if (!b) return;
+  state.use = state.use === b.dataset.use ? "" : b.dataset.use; syncUses(); render();
+});
 let t; $("#q").addEventListener("input", (e) => { clearTimeout(t); t = setTimeout(() => { state.q = e.target.value; render(); }, 120); });
 
-function setCat(id) {
-  state.cat = id;
-  document.querySelectorAll("#chips .chip").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.cat === id)));
-  const active = $(`#chips .chip[data-cat="${id}"]`);
-  if (active) { const row = $("#chips"); row.scrollLeft = active.offsetLeft - row.clientWidth / 2 + active.clientWidth / 2; }
-  render();
-}
-
-/* ---------- filtering & render ---------- */
+/* ---------- render ---------- */
 function matches(p) {
-  if (state.cat && p.cat !== state.cat) return false;
   if (state.use && !p.uses.includes(state.use)) return false;
   if (state.q.trim()) {
-    const hay = [p.name, p.code, p.d, p.l, p.finish, p.head, p.app, p.mat, catById[p.cat].name, p.uses.join(" ")].join(" ").toLowerCase();
+    const hay = [p.name, p.std, p.d, p.l, p.finish, p.head, p.point, p.app, p.mat, catById[p.cat].name, p.uses.join(" ")].filter(Boolean).join(" ").toLowerCase();
     return state.q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
   }
   return true;
 }
+const specLine = (p) => [p.d && `Ø ${p.d}`, p.l && `L ${p.l}`].filter(Boolean).join(" · ") || "Sizes on request";
 
-function card(p) {
+function bin(p) {
   const inQ = !!quote[p.id];
-  return `<li class="card">
-    <div class="card__media"><span class="card__code">${esc(p.code)}</span>
-      <img src="${img(p)}" alt="" loading="lazy" decoding="async" width="320" height="240"></div>
-    <div class="card__body">
-      <h3 class="card__name"><button type="button" data-open="${p.id}">${esc(p.name)}</button></h3>
-      <dl class="specs">
-        <dt>Ø</dt><dd>${esc(p.d)}</dd>
-        <dt>L</dt><dd>${esc(p.l)}</dd>
-        <dt class="opt">Use</dt><dd class="opt">${esc(p.app)}</dd>
-      </dl>
-      <div class="card__foot">
-        <p class="price" style="margin:0"><span class="price__from">from</span><span class="price__v">${gbp(p.p[0])}</span><span class="price__unit">${esc(p.p[1])}</span></p>
-        <button class="add" type="button" data-add="${p.id}" aria-pressed="${inQ}" aria-label="${inQ ? "Remove" : "Add"} ${esc(p.name)} ${inQ ? "from" : "to"} quote list">${inQ ? "✓ Added" : "+ Quote"}</button>
-      </div>
+  return `<li class="bin">
+    <div class="bin__img"><img src="${img(p)}" alt="" loading="lazy" decoding="async"></div>
+    <div class="bin__body">
+      <h3 class="bin__name"><button type="button" data-open="${p.id}">${esc(p.name)}</button></h3>
+      <p class="bin__spec">${esc(specLine(p))}</p>
+    </div>
+    <div class="ticket">
+      <p class="ticket__price" style="margin:0"><span class="ticket__from">from</span><span class="ticket__v">${gbp(p.p[0])}</span><span class="ticket__unit">${esc(p.p[1])}</span></p>
+      <button class="add" type="button" data-add="${p.id}" aria-pressed="${inQ}" aria-label="${inQ ? "Remove" : "Add"} ${esc(p.name)} ${inQ ? "from" : "to"} quote list">${inQ ? "✓" : "+"}</button>
     </div>
   </li>`;
 }
 
+let spy;
 function render() {
-  let list = PRODUCTS.filter(matches);
-  const out = $("#results");
-  if (state.sort === "az") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
-  if (state.sort === "price") list = [...list].sort((a, b) => a.p[0] - b.p[0]);
-
-  if (state.sort === "cat") {
-    out.innerHTML = CATEGORIES.map((c) => {
-      const items = list.filter((p) => p.cat === c.id);
-      if (!items.length) return "";
-      return `<section class="group" aria-labelledby="g-${c.id}">
-        <div class="group__head"><h3 class="group__title" id="g-${c.id}">${esc(c.name)}</h3><p class="group__blurb">${esc(c.blurb)}</p></div>
-        <ul class="grid">${items.map(card).join("")}</ul></section>`;
-    }).join("");
-  } else {
-    out.innerHTML = `<ul class="grid" style="margin-top:16px">${list.map(card).join("")}</ul>`;
-  }
-  $("#count").textContent = `${list.length} product${list.length === 1 ? "" : "s"}${state.cat ? " in " + catById[state.cat].name : ""}`;
+  const list = PRODUCTS.filter(matches);
+  const shown = new Set();
+  $("#results").innerHTML = CATEGORIES.map((c, i) => {
+    const items = list.filter((p) => p.cat === c.id);
+    if (!items.length) return "";
+    shown.add(c.id);
+    return `<section class="aisle" id="aisle-${c.id}" aria-labelledby="t-${c.id}">
+      <header class="aisle__head"><span class="aisle__no" aria-hidden="true">${pad(i + 1)}</span>
+        <h2 class="aisle__title" id="t-${c.id}">${esc(c.name)}</h2><p class="aisle__blurb">${esc(c.blurb)}</p></header>
+      <ul class="bins">${items.map(bin).join("")}</ul></section>`;
+  }).join("");
+  const filtered = state.q.trim() || state.use;
+  $("#count").textContent = filtered ? `${list.length} of ${PRODUCTS.length} products match` : "";
   $("#empty").hidden = list.length > 0;
+  $$("[data-aisle]").forEach((a) => a.classList.toggle("is-empty", !shown.has(a.dataset.aisle)));
+
+  // Scroll spy: highlight the aisle you are in
+  spy?.disconnect();
+  spy = new IntersectionObserver((entries) => {
+    for (const en of entries) if (en.isIntersecting) setCurrent(en.target.id.replace("aisle-", ""));
+  }, { rootMargin: "-25% 0px -70% 0px" });
+  $$(".aisle").forEach((s) => spy.observe(s));
+}
+function setCurrent(id) {
+  $$("[data-aisle]").forEach((a) => a.setAttribute("aria-current", String(a.dataset.aisle === id)));
+  const chip = $(`#chips [data-aisle="${id}"]`), row = $("#chips");
+  if (chip && row.clientWidth) row.scrollTo({ left: chip.offsetLeft - row.clientWidth / 2 + chip.clientWidth / 2, behavior: reduced() ? "auto" : "smooth" });
 }
 
 $("#results").addEventListener("click", (e) => {
   const add = e.target.closest("[data-add]");
-  if (add) { toggleQuote(add.dataset.add); return; }
-  const open = e.target.closest("[data-open]") || e.target.closest(".card")?.querySelector("[data-open]");
+  if (add) return toggleQuote(add.dataset.add);
+  const open = e.target.closest("[data-open]") || e.target.closest(".bin")?.querySelector("[data-open]");
   if (open) openProduct(open.dataset.open);
 });
 
-/* ---------- product dialog ---------- */
+/* ---------- product sheet ---------- */
 const pdlg = $("#product");
 function openProduct(id) {
-  const p = byId[id]; const c = catById[p.cat];
-  const rows = [["Standard / type", p.code], ["Diameter / size", p.d], ["Length", p.l], ["Material", p.mat], ["Finish", p.finish], ["Head / drive", p.head], ["Point", p.point], ["Best for", p.app]]
-    .filter(([, v]) => v && v !== "—");
+  const p = byId[id], c = catById[p.cat];
+  const rows = [["Size", p.d], ["Length", p.l], ["Material", p.mat], ["Finish", p.finish], ["Head", p.head], ["Thread / point", p.point], ["Use", p.app]].filter(([, v]) => v);
+  if (!p.d && !p.l) rows.unshift(["Sizes", "On request"]);
   const inQ = !!quote[id];
   $("#product-body").innerHTML = `
     <button class="icon-btn pd__close" type="button" data-close aria-label="Close">✕</button>
@@ -130,19 +135,19 @@ function openProduct(id) {
       <div>
         <p class="pd__cat">${esc(c.name)}</p>
         <h2 class="pd__name" id="p-name">${esc(p.name)}</h2>
-        <div class="pd__price"><span class="price__from">from</span><span class="price__v">${gbp(p.p[0])}</span><span class="price__unit">${esc(p.p[1])} · ex. VAT</span></div>
+        <div class="pd__price"><span class="ticket__from">from</span><span class="ticket__v">${gbp(p.p[0])}</span><span class="ticket__unit">${esc(p.p[1])}, ex. VAT</span></div>
         <table class="spec-table"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
         <div class="sheet__actions">
           <button class="btn btn--hivis" type="button" data-add="${p.id}" aria-pressed="${inQ}">${inQ ? "✓ In quote list" : "+ Add to quote"}</button>
-          <a class="btn btn--wa" target="_blank" rel="noopener" href="${waLink(`Hi ${BRAND.name}, I'm interested in: ${p.name} (${p.code}). Can you give me a price?`)}">Ask on WhatsApp</a>
+          <a class="btn btn--wa" target="_blank" rel="noopener" href="${waLink(`Hi ${BRAND.name}, I'm interested in: ${p.name}. Can you give me a price?`)}">Ask on WhatsApp</a>
         </div>
-        <p class="pd__note">Indicative price for the pack shown. Other sizes, finishes and bulk quantities priced on request.</p>
+        <p class="pd__note">Guide price. Tell us the size, finish and quantity you need and we will confirm the exact price.</p>
       </div>
     </div>`;
   pdlg.showModal();
 }
 pdlg.addEventListener("click", (e) => {
-  if (e.target === pdlg || e.target.closest("[data-close]")) pdlg.close();
+  if (e.target === pdlg || e.target.closest("[data-close]")) return pdlg.close();
   const add = e.target.closest("[data-add]");
   if (add) { toggleQuote(add.dataset.add); const on = !!quote[add.dataset.add]; add.setAttribute("aria-pressed", on); add.textContent = on ? "✓ In quote list" : "+ Add to quote"; }
 });
@@ -151,19 +156,19 @@ pdlg.addEventListener("click", (e) => {
 const qdlg = $("#quote");
 function toggleQuote(id) {
   if (quote[id]) { delete quote[id]; toast("Removed from quote list"); }
-  else { quote[id] = 1; toast("Added to quote list"); bump(); }
-  save(); syncQuote(); render();
+  else { quote[id] = 1; toast("Added to quote list"); $$("[data-quote-open]").forEach((f) => { f.classList.remove("bump"); void f.offsetWidth; f.classList.add("bump"); }); }
+  save(); syncQuote();
+  $$(`#results [data-add="${id}"]`).forEach((b) => { const on = !!quote[id]; b.setAttribute("aria-pressed", on); b.textContent = on ? "✓" : "+"; });
 }
-function bump() { const f = $("#quote-fab"); f.classList.remove("bump"); void f.offsetWidth; f.classList.add("bump"); }
 function quoteText() {
-  const lines = Object.entries(quote).map(([id, n]) => `• ${n} × ${byId[id].name} (${byId[id].code}) — ${byId[id].p[1]}`);
+  const lines = Object.entries(quote).map(([id, n]) => `• ${n} x ${byId[id].name} (${byId[id].p[1]})`);
   const note = $("#qnote").value.trim();
   return `Hi ${BRAND.name}, please can I get a quote for:\n\n${lines.join("\n")}${note ? `\n\nNotes: ${note}` : ""}\n\nThanks!`;
 }
 function syncQuote() {
   const ids = Object.keys(quote);
-  $("#quote-n").textContent = ids.length;
-  $("#quote-fab").setAttribute("aria-label", `Open quote list, ${ids.length} item${ids.length === 1 ? "" : "s"}`);
+  $$("[data-quote-n]").forEach((el) => (el.textContent = ids.length));
+  $$("[data-quote-open]").forEach((el) => el.setAttribute("aria-label", `Open quote list, ${ids.length} item${ids.length === 1 ? "" : "s"}`));
   $("#qempty").hidden = ids.length > 0;
   $("#qactions").hidden = ids.length === 0;
   $("#qnote-wrap").hidden = ids.length === 0;
@@ -172,12 +177,12 @@ function syncQuote() {
     return `<li class="qitem"><img src="${img(p)}" alt="">
       <div><div class="qitem__name">${esc(p.name)}</div><div class="qitem__unit">${esc(p.p[1])}</div></div>
       <div class="qty" role="group" aria-label="Quantity of ${esc(p.name)}">
-        <button type="button" data-dec="${id}" aria-label="Decrease">−</button><output aria-live="polite">${quote[id]}</output><button type="button" data-inc="${id}" aria-label="Increase">+</button>
+        <button type="button" data-dec="${id}" aria-label="Decrease">−</button><output>${quote[id]}</output><button type="button" data-inc="${id}" aria-label="Increase">+</button>
       </div></li>`;
   }).join("");
   $("#q-send").href = waLink(quoteText());
 }
-$("#quote-fab").addEventListener("click", () => { syncQuote(); qdlg.showModal(); });
+$$("[data-quote-open]").forEach((b) => b.addEventListener("click", () => { syncQuote(); qdlg.showModal(); }));
 qdlg.addEventListener("click", (e) => {
   if (e.target === qdlg || e.target.closest("[data-close]")) return qdlg.close();
   const inc = e.target.closest("[data-inc]"), dec = e.target.closest("[data-dec]");
@@ -187,10 +192,19 @@ qdlg.addEventListener("click", (e) => {
 });
 $("#qnote").addEventListener("input", () => ($("#q-send").href = waLink(quoteText())));
 $("#q-copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(quoteText()); toast("List copied — paste it in a text or email"); }
-  catch { toast("Couldn't copy — try the WhatsApp button"); }
+  try { await navigator.clipboard.writeText(quoteText()); toast("List copied. Paste it in a text or email"); }
+  catch { toast("Couldn't copy. Try the WhatsApp button"); }
 });
 $("#q-clear").addEventListener("click", () => { quote = {}; save(); syncQuote(); render(); toast("Quote list cleared"); });
+
+/* ---------- dock (phones) ---------- */
+const adlg = $("#aisles-sheet");
+$("[data-aisles-open]").addEventListener("click", () => adlg.showModal());
+adlg.addEventListener("click", (e) => { if (e.target === adlg || e.target.closest("[data-close]")) adlg.close(); });
+$("[data-search-focus]").addEventListener("click", () => {
+  $("#yard").scrollIntoView({ behavior: "auto" });
+  $("#q").focus();
+});
 
 let tt; function toast(msg) { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => el.classList.remove("show"), 2200); }
 
