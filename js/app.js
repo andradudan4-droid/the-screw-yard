@@ -12,7 +12,14 @@ const waLink = (text) => `https://wa.me/${BRAND.whatsapp}?text=${encodeURICompon
 const countIn = (cat) => PRODUCTS.filter((p) => p.cat === cat).length;
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const state = { q: "", use: "" };
+const state = { q: "", use: "", cat: "" };
+
+// Show one aisle (or all with ""), and bring the catalogue into view
+function showAisle(id, jump = true) {
+  state.cat = id; state.q = ""; state.use = ""; $("#q").value = "";
+  syncUses(); render();
+  if (jump) { const y = $("#yard").getBoundingClientRect().top + scrollY; scrollTo({ top: y, behavior: "instant" }); }
+}
 
 /* ---------- quote list storage ---------- */
 const KEY = "tsy-quote-v1";
@@ -28,8 +35,14 @@ $$("[data-wa-general]").forEach((a) => {
   a.target = "_blank"; a.rel = "noopener";
 });
 
-// Aisle chips: plain anchor links
-$("#chips").innerHTML = CATEGORIES.map((c) => `<a class="chip" href="#aisle-${c.id}" data-aisle="${c.id}">${esc(c.short)}</a>`).join("");
+// Aisle chips: each one shows just that aisle
+$("#chips").innerHTML = `<button class="chip" type="button" data-aisle="">All</button>` +
+  CATEGORIES.map((c) => `<button class="chip" type="button" data-aisle="${c.id}">${esc(c.short)}</button>`).join("");
+$("#chips").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-aisle]"); if (!b) return;
+  showAisle(b.dataset.aisle, false);
+  scrollTo({ top: Math.min(scrollY, $("#yard").getBoundingClientRect().top + scrollY), behavior: "instant" });
+});
 
 // Stock board: one row per aisle (hero on desktop, sheet on phones)
 $$("[data-board]").forEach((ul) => {
@@ -49,8 +62,7 @@ $$("[data-board]").forEach((ul) => {
   ul.addEventListener("click", (e) => {
     const b = e.target.closest("[data-row]"); if (!b) return;
     $("#aisles-sheet").open && $("#aisles-sheet").close();
-    if (state.q || state.use) { state.q = ""; state.use = ""; $("#q").value = ""; syncUses(); render(); }
-    $(`#aisle-${b.dataset.row}`)?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
+    showAisle(b.dataset.row);
   });
 });
 
@@ -61,7 +73,7 @@ $("#uses").addEventListener("click", (e) => {
   const b = e.target.closest("[data-use]"); if (!b) return;
   state.use = state.use === b.dataset.use ? "" : b.dataset.use; syncUses(); render();
 });
-let t; $("#q").addEventListener("input", (e) => { clearTimeout(t); t = setTimeout(() => { state.q = e.target.value; render(); }, 120); });
+let t; $("#q").addEventListener("input", (e) => { clearTimeout(t); t = setTimeout(() => { state.q = e.target.value; if (state.q.trim()) state.cat = ""; render(); }, 120); });
 
 /* ---------- render ---------- */
 function matches(p) {
@@ -89,14 +101,13 @@ function bin(p) {
   </li>`;
 }
 
-let spy;
 function render() {
-  const list = PRODUCTS.filter(matches);
-  const shown = new Set();
+  const all = PRODUCTS.filter(matches);
+  const shown = new Set(all.map((p) => p.cat));
+  const list = state.cat ? all.filter((p) => p.cat === state.cat) : all;
   $("#results").innerHTML = CATEGORIES.map((c, i) => {
     const items = list.filter((p) => p.cat === c.id);
     if (!items.length) return "";
-    shown.add(c.id);
     return `<section class="aisle" id="aisle-${c.id}" aria-labelledby="t-${c.id}">
       <header class="aisle__head"><span class="aisle__no" aria-hidden="true">${pad(i + 1)}</span>
         <h2 class="aisle__title" id="t-${c.id}">${esc(c.name)}</h2><p class="aisle__blurb">${esc(c.blurb)}</p></header>
@@ -105,19 +116,12 @@ function render() {
   const filtered = state.q.trim() || state.use;
   $("#count").textContent = filtered ? `${list.length} of ${PRODUCTS.length} products match` : "";
   $("#empty").hidden = list.length > 0;
-  $$("[data-aisle]").forEach((a) => a.classList.toggle("is-empty", !shown.has(a.dataset.aisle)));
-
-  // Scroll spy: highlight the aisle you are in
-  spy?.disconnect();
-  spy = new IntersectionObserver((entries) => {
-    for (const en of entries) if (en.isIntersecting) setCurrent(en.target.id.replace("aisle-", ""));
-  }, { rootMargin: "-25% 0px -70% 0px" });
-  $$(".aisle").forEach((s) => spy.observe(s));
-}
-function setCurrent(id) {
-  $$("[data-aisle]").forEach((a) => a.setAttribute("aria-current", String(a.dataset.aisle === id)));
-  const chip = $(`#chips [data-aisle="${id}"]`), row = $("#chips");
-  if (chip && row.clientWidth) row.scrollTo({ left: chip.offsetLeft - row.clientWidth / 2 + chip.clientWidth / 2, behavior: reduced() ? "auto" : "smooth" });
+  $$("[data-aisle]").forEach((a) => {
+    a.classList.toggle("is-empty", !!a.dataset.aisle && !shown.has(a.dataset.aisle));
+    a.setAttribute("aria-pressed", String(a.dataset.aisle === state.cat));
+  });
+  const chip = $(`#chips [data-aisle="${state.cat}"]`), row = $("#chips");
+  if (chip && row.clientWidth) row.scrollTo({ left: chip.offsetLeft - row.clientWidth / 2 + chip.clientWidth / 2, behavior: "instant" });
 }
 
 $("#results").addEventListener("click", (e) => {
@@ -208,7 +212,7 @@ const adlg = $("#aisles-sheet");
 $("[data-aisles-open]").addEventListener("click", () => adlg.showModal());
 adlg.addEventListener("click", (e) => { if (e.target === adlg || e.target.closest("[data-close]")) adlg.close(); });
 $("[data-search-focus]").addEventListener("click", () => {
-  $("#yard").scrollIntoView({ behavior: "auto" });
+  $("#yard").scrollIntoView({ behavior: "instant" });
   $("#q").focus();
 });
 
