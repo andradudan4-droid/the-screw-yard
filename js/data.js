@@ -30,6 +30,7 @@ export const BRAND = {
   phoneDisplay: "07958 146 847",
   phoneTel: "+447958146847",
   whatsapp: "447958146847",
+  email: "thescrewyard@gmail.com",
 };
 
 export const CATEGORIES = [

@@ -272,3 +272,54 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .uses { flex: 1 1 100%; }
   .use { min-height: 40px; }
 }
+
+/* ---------- priced lines, size picker, basket ---------- */
+.btn--sm { min-height: 40px; padding: 0 1.1em; font-size: .92rem; }
+.offer { margin: 0; padding: 10px var(--pad); background: var(--hivis); color: var(--ink); text-align: center; font-weight: 650; font-size: .98rem; }
+.offer b { font-weight: 900; text-transform: uppercase; font-stretch: 110%; }
+
+.deals { margin-bottom: 8px; }
+.deals__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 10px 20px; border-bottom: 3px solid var(--ink); padding-bottom: 12px; margin-bottom: 16px; }
+.deals__offer { margin: 0; padding: 8px 14px; background: var(--ink); color: #fff; border-radius: 6px; font-size: .92rem; white-space: nowrap; }
+.deals__offer b { color: var(--hivis); }
+.pcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.pcard { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 16px; background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 16px; box-shadow: 6px 6px 0 var(--hivis); }
+.pcard__img { padding: 0; border: 0; background: #fff; border-radius: 6px; cursor: pointer; align-self: start; }
+.pcard__img img { width: 100%; aspect-ratio: 1; object-fit: contain; display: block; }
+.pcard__name { font-size: 1.3rem; font-weight: 850; font-stretch: 108%; line-height: 1.1; margin: 0 0 4px; }
+.pcard__spec { margin: 0 0 12px; font-size: .86rem; color: var(--muted); }
+
+.sizes { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.sizes thead th { text-align: left; font-family: var(--f-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 0 0 6px; border-bottom: 2px solid var(--ink); }
+.sizes tbody th, .sizes td { padding: 9px 0; border-bottom: 1px solid var(--line); vertical-align: middle; text-align: left; }
+.sizes tbody th { font-family: var(--f-mono); font-weight: 600; font-size: .98rem; white-space: nowrap; padding-right: 10px; }
+.sizes tr.is-in th, .sizes tr.is-in td { background: #fff7cf; }
+.sizes tr.is-in th { box-shadow: inset 4px 0 0 var(--hivis); padding-left: 10px; }
+.sizes__ex { display: block; font-size: .8rem; color: var(--ink-2); line-height: 1.15; }
+.sizes__ex b { font-size: 1.22rem; font-weight: 900; color: var(--ink); }
+.sizes__inc { display: block; font-size: .8rem; color: var(--muted); }
+.sizes__act { text-align: right !important; white-space: nowrap; width: 1%; padding-left: 8px !important; }
+.qty--sm button { width: 36px; height: 36px; }
+.qty--sm { background: #fff; border-color: var(--ink); }
+
+.fab__total { font-family: var(--f-mono); font-weight: 600; color: var(--hivis); padding-left: .2em; }
+.qitem__line { font-weight: 800; margin-top: 2px; }
+.qitem__line span { font-weight: 400; font-size: .76rem; color: var(--muted); }
+.qtotals { margin-top: 14px; }
+.qdel { margin: 0 0 10px; padding: 9px 12px; border-radius: 8px; background: var(--paper-2); font-weight: 700; font-size: .92rem; text-align: center; }
+.qdel.is-free { background: #1f8a4c; color: #fff; }
+.qsum { margin: 0; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; }
+.qsum > div { display: flex; justify-content: space-between; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+.qsum dt { color: var(--ink-2); }
+.qsum dd { margin: 0; font-family: var(--f-mono); font-weight: 600; }
+.qsum .qsum__total { background: var(--hivis); border-bottom: 0; padding: 12px 14px; }
+.qsum__total dt { color: var(--ink); font-weight: 800; }
+.qsum__total dd { font-size: 1.35rem; font-weight: 700; }
+.qsum__ask { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
+
+@media (max-width: 900px) { .pcards { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) {
+  .pcard { grid-template-columns: minmax(0, 1fr); padding: 12px; box-shadow: 4px 4px 0 var(--hivis); }
+  .pcard__img { max-width: 120px; }
+  .deals__offer { white-space: normal; }
+}

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css?v=8">
+  <link rel="stylesheet" href="/css/styles.css?v=9">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"HardwareStore","name":"The Screw Yard","url":"https://thescrewyard.co.uk/","telephone":"+447958146847","description":"Screws, nails, bolts, anchors and rivets for trade and DIY.","parentOrganization":{"@type":"Organization","name":"CMD Team Ltd"}}
   </script>
@@ -72,6 +72,7 @@
         </div>
       </section>
       <div class="hazard" aria-hidden="true"></div>
+      <p class="offer"><b>Free delivery</b> when you order <span data-free-boxes>5</span> boxes or more</p>
 
       <!-- THE YARD -->
       <section class="yard" id="yard" aria-label="Catalogue">
@@ -87,7 +88,7 @@
         <p class="count" id="count" aria-live="polite"></p>
         <div id="results"></div>
         <p class="empty" id="empty" hidden>Nothing matches that. Try another word, or <a href="#order">ask us</a>. We can source more than what is listed.</p>
-        <p class="pricenote">Prices shown are per box. For everything else, contact us for details. We confirm price and stock when you send your list.</p>
+        <p class="pricenote">Prices are per box, shown excluding and including VAT at 20%. Free delivery on 5 boxes or more. For everything else, contact us for details. We confirm stock when you send your order.</p>
       </section>
 
       <!-- ORDER: docket + phone -->
@@ -114,7 +115,7 @@
 
       <footer class="footer">
         <p><b>The Screw Yard</b> · Screws, bolts and fasteners</p>
-        <p class="footer__small">The Screw Yard is a trading name of CMD Team Ltd, registered in England and Wales, company number 16231862. Registered office: 33 Belben Road, Poole, BH12 4PH. Email: demo@cmdteam.co.uk (placeholder, this is a demo site). Prices are confirmed when you enquire and do not include delivery. Images are representative.</p>
+        <p class="footer__small">The Screw Yard is a trading name of CMD Team Ltd, registered in England and Wales, company number 16231862. Registered office: 33 Belben Road, Poole, BH12 4PH. Email: thescrewyard@gmail.com. Prices are shown excluding and including VAT. Free delivery on 5 boxes or more. Images are representative.</p>
         <p class="footer__links"><a href="/terms.html">Terms of use</a><a href="/privacy.html">Privacy policy</a><a href="/cookies.html">Cookies</a></p>
       </footer>
     </main>
@@ -122,14 +123,14 @@
 
   <!-- Floating quote button (desktop) -->
   <button class="quote-fab" type="button" data-quote-open aria-haspopup="dialog">
-    <svg aria-hidden="true"><use href="#i-list"/></svg><span>Quote list</span><span class="badge" data-quote-n>0</span>
+    <svg aria-hidden="true"><use href="#i-list"/></svg><span>Basket</span><span class="badge" data-quote-n>0</span><span class="fab__total" data-quote-total hidden></span>
   </button>
 
   <!-- Bottom dock (phones and tablets) -->
   <nav class="dock" aria-label="Quick actions">
     <button type="button" data-aisles-open aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-grid"/></svg><span>Aisles</span></button>
     <button type="button" data-search-focus><svg aria-hidden="true"><use href="#i-search"/></svg><span>Search</span></button>
-    <button type="button" class="dock__quote" data-quote-open aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-list"/></svg><span>Quote</span><span class="badge" data-quote-n>0</span></button>
+    <button type="button" class="dock__quote" data-quote-open aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-list"/></svg><span>Basket</span><span class="badge" data-quote-n>0</span></button>
     <a href="tel:+447958146847"><svg aria-hidden="true"><use href="#i-phone"/></svg><span>Call</span></a>
   </nav>
 
@@ -153,24 +154,25 @@
   <dialog class="sheet sheet--quote" id="quote" aria-labelledby="quote-title">
     <div class="sheet__body">
       <div class="sheet__head">
-        <h2 id="quote-title" class="h3">Your quote list</h2>
-        <button class="icon-btn" type="button" data-close aria-label="Close quote list">✕</button>
+        <h2 id="quote-title" class="h3">Your basket</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Close basket">✕</button>
       </div>
       <ul class="qlist" id="qlist"></ul>
-      <p class="qempty" id="qempty">Nothing here yet. Tap <b>+</b> on any product to add it.</p>
+      <p class="qempty" id="qempty">Your basket is empty. Pick a size and tap <b>Add</b>, or tap <b>+</b> on any product.</p>
+      <div class="qtotals" id="qtotals" hidden></div>
       <label class="qnote" id="qnote-wrap">
         <span>Anything else? (sizes, colour, delivery postcode)</span>
         <textarea id="qnote" rows="3" placeholder="e.g. 4.0 x 40 yellow, 20 boxes, delivery to M1"></textarea>
       </label>
       <div class="sheet__actions" id="qactions">
-        <a class="btn btn--wa" id="q-send" href="#" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg>Send list on WhatsApp</a>
-        <button class="btn btn--line" type="button" id="q-copy">Copy list</button>
-        <button class="linkbtn" type="button" id="q-clear">Clear list</button>
+        <a class="btn btn--wa" id="q-send" href="#" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg>Send order on WhatsApp</a>
+        <button class="btn btn--line" type="button" id="q-copy">Copy order</button>
+        <button class="linkbtn" type="button" id="q-clear">Empty basket</button>
       </div>
     </div>
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="/js/app.js?v=8"></script>
+  <script type="module" src="/js/app.js?v=9"></script>
 </body>
 </html>
