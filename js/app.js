@@ -130,7 +130,7 @@ function pcard(p) {
 function bin(p) {
   const inQ = !!quote[p.id];
   return `<li class="bin">
-    <div class="bin__img"><img src="${img(p)}" alt="" loading="lazy" decoding="async"></div>
+    <div class="bin__img"><img src="${img(p)}" alt="${esc(p.name)}" loading="lazy" decoding="async"></div>
     <div class="bin__body">
       <h3 class="bin__name"><button type="button" data-open="${p.id}">${esc(p.name)}</button></h3>
       <p class="bin__spec">${esc(specLine(p))}</p>
