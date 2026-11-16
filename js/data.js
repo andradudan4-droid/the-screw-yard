@@ -34,16 +34,16 @@ export const BRAND = {
 };
 
 export const CATEGORIES = [
-  { id: "drywall", name: "Drywall Screws", short: "Drywall", blurb: "Plasterboard to timber or metal stud. Loose or collated." },
-  { id: "wood", name: "Wood & Timber Screws", short: "Wood", blurb: "Chipboard, coach, confirmat and timber screws." },
-  { id: "self-tapping", name: "Self-Tapping Screws", short: "Self-tapping", blurb: "Sharp point screws that cut their own thread." },
-  { id: "self-drilling", name: "Self-Drilling Screws", short: "Self-drilling", blurb: "Drill point screws for steel, cladding and roofing." },
-  { id: "concrete", name: "Concrete Screws & Anchors", short: "Anchors", blurb: "Concrete screws, wedge, drop-in and nylon anchors." },
-  { id: "bolts", name: "Bolts, Nuts & Machine Screws", short: "Bolts & nuts", blurb: "Hex bolts, threaded bar, nuts, washers, machine screws." },
-  { id: "nails", name: "Nails", short: "Nails", blurb: "Common, roofing, concrete, clout and specialist nails." },
-  { id: "collated", name: "Collated Nails & Staples", short: "Nail gun", blurb: "Coil nails, strip nails, brads and staples for nailers." },
-  { id: "rivets", name: "Rivets & Rivet Nuts", short: "Rivets", blurb: "Blind rivets: standard, large flange and waterproof." },
-  { id: "specialist", name: "Hooks, Clips & Accessories", short: "Accessories", blurb: "Hooks, pins, clips, bits, cam fittings and washers." },
+  { id: "drywall", slug: "drywall-screws", name: "Drywall Screws", short: "Drywall", blurb: "Plasterboard to timber or metal stud. Loose or collated." },
+  { id: "wood", slug: "wood-screws", name: "Wood & Timber Screws", short: "Wood", blurb: "Chipboard, coach, confirmat and timber screws." },
+  { id: "self-tapping", slug: "self-tapping-screws", name: "Self-Tapping Screws", short: "Self-tapping", blurb: "Sharp point screws that cut their own thread." },
+  { id: "self-drilling", slug: "self-drilling-screws", name: "Self-Drilling Screws", short: "Self-drilling", blurb: "Drill point screws for steel, cladding and roofing." },
+  { id: "concrete", slug: "concrete-screws-anchors", name: "Concrete Screws & Anchors", short: "Anchors", blurb: "Concrete screws, wedge, drop-in and nylon anchors." },
+  { id: "bolts", slug: "bolts-nuts", name: "Bolts, Nuts & Machine Screws", short: "Bolts & nuts", blurb: "Hex bolts, threaded bar, nuts, washers, machine screws." },
+  { id: "nails", slug: "nails", name: "Nails", short: "Nails", blurb: "Common, roofing, concrete, clout and specialist nails." },
+  { id: "collated", slug: "collated-nails-staples", name: "Collated Nails & Staples", short: "Nail gun", blurb: "Coil nails, strip nails, brads and staples for nailers." },
+  { id: "rivets", slug: "rivets", name: "Rivets & Rivet Nuts", short: "Rivets", blurb: "Blind rivets: standard, large flange and waterproof." },
+  { id: "specialist", slug: "hooks-clips-accessories", name: "Hooks, Clips & Accessories", short: "Accessories", blurb: "Hooks, pins, clips, bits, cam fittings and washers." },
 ];
 
 export const USES = [

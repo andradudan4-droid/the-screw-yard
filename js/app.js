@@ -160,7 +160,7 @@ function render() {
     if (!items.length) return "";
     return `<section class="aisle" id="aisle-${c.id}" aria-labelledby="t-${c.id}">
       <header class="aisle__head"><span class="aisle__no" aria-hidden="true">${pad(i + 1)}</span>
-        <h2 class="aisle__title" id="t-${c.id}">${esc(c.name)}</h2><p class="aisle__blurb">${esc(c.blurb)}</p></header>
+        <h2 class="aisle__title" id="t-${c.id}">${esc(c.name)}</h2><p class="aisle__blurb">${esc(c.blurb)} <a href="/${c.slug}">Full specs</a></p></header>
       <ul class="bins">${items.map(bin).join("")}</ul></section>`;
   }).join("");
   const filtered = state.q.trim() || state.use;
@@ -313,3 +313,7 @@ let tt; function toast(msg) { const el = $("#toast"); el.textContent = msg; el.c
 
 render();
 syncQuote();
+
+// Links from the category pages open the catalogue on that aisle
+const qa = new URLSearchParams(location.search).get("aisle");
+if (qa && catById[qa]) showAisle(qa);

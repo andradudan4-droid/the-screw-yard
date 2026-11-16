@@ -1,6 +1,7 @@
 // Writes the catalogue into index.html as plain HTML so search engines can read it
 // without running JavaScript. Run after editing js/data.js:  node tools/prerender.mjs
 import { readFileSync, writeFileSync } from "node:fs";
+import { writeCategoryPages } from "./categories.mjs";
 import { PRICES, BRAND, CATEGORIES, PRODUCTS } from "../js/data.js";
 
 const file = new URL("../index.html", import.meta.url);
@@ -31,7 +32,7 @@ const html = `
 ${CATEGORIES.map((c, i) => {
   const items = rest.filter((p) => p.cat === c.id);
   return !items.length ? "" : `<section class="aisle" id="aisle-${c.id}"><header class="aisle__head"><span class="aisle__no" aria-hidden="true">${pad(i + 1)}</span>
-<h2 class="aisle__title">${esc(c.name)}</h2><p class="aisle__blurb">${esc(c.blurb)}</p></header>
+<h2 class="aisle__title">${esc(c.name)}</h2><p class="aisle__blurb">${esc(c.blurb)} <a href="/${c.slug}">Full specs</a></p></header>
 <ul class="bins">${items.map(bin).join("\n")}</ul></section>`;
 }).join("\n")}
 `;
@@ -65,4 +66,5 @@ s = s.replace(/<!--pre-start-->[\s\S]*?<!--pre-end-->/, () => `<!--pre-start-->$
 s = s.replace(/(<script type="application\/ld\+json">)[\s\S]*?(<\/script>)/, (_, a, b) => `${a}\n  ${JSON.stringify(ld).replace(/</g, "\\u003c")}\n  ${b}`);
 s = s.replace(/(<span data-count-products>)\d+(<\/span>)/, `$1${PRODUCTS.length}$2`);
 writeFileSync(file, s);
+writeCategoryPages();
 console.log(`${PRODUCTS.length} products written`);
