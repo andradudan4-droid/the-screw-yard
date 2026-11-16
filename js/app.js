@@ -1,4 +1,4 @@
-import { BRAND, CATEGORIES, USES, PRODUCTS } from "./data.js";
+import { BRAND, CATEGORIES, USES, PRODUCTS, PRICES } from "./data.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -8,6 +8,11 @@ const pad = (n) => String(n).padStart(2, "0");
 const catById = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 const byId = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
 const img = (p) => `/assets/products/${p.id}.webp`;
+const priced = (p) => PRICES[p.id];
+const fromOf = (p) => Math.min(...PRICES[p.id].sizes.map((x) => x[1]));
+const ticket = (p) => priced(p)
+  ? `<span class="ticket__from">from</span><span class="ticket__v">${gbp(fromOf(p))}</span><span class="ticket__unit">${esc(PRICES[p.id].unit)}</span>`
+  : `<span class="ticket__ask">Contact for details</span>`;
 const waLink = (text) => `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(text)}`;
 const countIn = (cat) => PRODUCTS.filter((p) => p.cat === cat).length;
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -48,15 +53,16 @@ $("#chips").addEventListener("click", (e) => {
 $$("[data-board]").forEach((ul) => {
   ul.innerHTML = CATEGORIES.map((c, i) => {
     const items = PRODUCTS.filter((p) => p.cat === c.id);
-    const from = Math.min(...items.map((p) => p.p[0]));
+    const pr = items.filter(priced).map(fromOf);
+    const from = pr.length ? `from ${gbp(Math.min(...pr))}` : "contact for details";
     return `
-    <li><button class="row" type="button" data-row="${c.id}" aria-label="${esc(c.name)}, ${items.length} lines, from ${gbp(from)}">
+    <li><button class="row" type="button" data-row="${c.id}" aria-label="${esc(c.name)}, ${items.length} lines, ${from}">
       <span class="row__n">${pad(i + 1)}</span>
       <img class="row__img" src="${img(items[0])}" alt="" width="40" height="40" loading="lazy">
       <span class="row__name">${esc(c.short)}</span>
       <span class="row__dots" aria-hidden="true"></span>
       <span class="row__count">${items.length} lines</span>
-      <span class="row__from">from <b>${gbp(from)}</b></span>
+      <span class="row__from">${pr.length ? `from <b>${gbp(Math.min(...pr))}</b>` : "<b>Ask</b>"}</span>
     </button></li>`;
   }).join("");
   ul.addEventListener("click", (e) => {
@@ -95,7 +101,7 @@ function bin(p) {
       <p class="bin__spec">${esc(specLine(p))}</p>
     </div>
     <div class="ticket">
-      <p class="ticket__price" style="margin:0"><span class="ticket__from">from</span><span class="ticket__v">${gbp(p.p[0])}</span><span class="ticket__unit">${esc(p.p[1])}</span></p>
+      <p class="ticket__price" style="margin:0">${ticket(p)}</p>
       <button class="add" type="button" data-add="${p.id}" aria-pressed="${inQ}" aria-label="${inQ ? "Remove" : "Add"} ${esc(p.name)} ${inQ ? "from" : "to"} quote list">${inQ ? "✓" : "+"}</button>
     </div>
   </li>`;
@@ -145,13 +151,15 @@ function openProduct(id) {
       <div>
         <p class="pd__cat">${esc(c.name)}</p>
         <h2 class="pd__name" id="p-name">${esc(p.name)}</h2>
-        <div class="pd__price"><span class="ticket__from">from</span><span class="ticket__v">${gbp(p.p[0])}</span><span class="ticket__unit">${esc(p.p[1])}, ex. VAT</span></div>
+        ${priced(p)
+          ? `<table class="price-table"><thead><tr><th scope="col">Size (mm)</th><th scope="col">Price ${esc(PRICES[p.id].unit)}</th></tr></thead><tbody>${PRICES[p.id].sizes.map(([sz, v]) => `<tr><td>${esc(sz)}</td><td>${gbp(v)}</td></tr>`).join("")}</tbody></table>`
+          : `<div class="pd__price"><span class="ticket__v">Contact for details</span></div>`}
         <table class="spec-table"><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
         <div class="sheet__actions">
           <button class="btn btn--hivis" type="button" data-add="${p.id}" aria-pressed="${inQ}">${inQ ? "✓ In quote list" : "+ Add to quote"}</button>
           <a class="btn btn--wa" target="_blank" rel="noopener" href="${waLink(`Hi ${BRAND.name}, I'm interested in: ${p.name}. Can you give me a price?`)}">Ask on WhatsApp</a>
         </div>
-        <p class="pd__note">Guide price. Tell us the size, finish and quantity you need and we will confirm the exact price.</p>
+        <p class="pd__note">${priced(p) ? "Need a different size? Contact us for details." : "Tell us the size, finish and quantity you need and we will send you a price."}</p>
       </div>
     </div>`;
   pdlg.showModal();
@@ -171,7 +179,7 @@ function toggleQuote(id) {
   $$(`#results [data-add="${id}"]`).forEach((b) => { const on = !!quote[id]; b.setAttribute("aria-pressed", on); b.textContent = on ? "✓" : "+"; });
 }
 function quoteText() {
-  const lines = Object.entries(quote).map(([id, n]) => `• ${n} x ${byId[id].name} (${byId[id].p[1]})`);
+  const lines = Object.entries(quote).map(([id, n]) => `• ${n} x ${byId[id].name}`);
   const note = $("#qnote").value.trim();
   return `Hi ${BRAND.name}, please can I get a quote for:\n\n${lines.join("\n")}${note ? `\n\nNotes: ${note}` : ""}\n\nThanks!`;
 }
@@ -185,7 +193,7 @@ function syncQuote() {
   $("#qlist").innerHTML = ids.map((id) => {
     const p = byId[id];
     return `<li class="qitem"><img src="${img(p)}" alt="">
-      <div><div class="qitem__name">${esc(p.name)}</div><div class="qitem__unit">${esc(p.p[1])}</div></div>
+      <div><div class="qitem__name">${esc(p.name)}</div><div class="qitem__unit">${priced(p) ? `from ${gbp(fromOf(p))} ${esc(PRICES[p.id].unit)}` : "Price on request"}</div></div>
       <div class="qty" role="group" aria-label="Quantity of ${esc(p.name)}">
         <button type="button" data-dec="${id}" aria-label="Decrease">−</button><output>${quote[id]}</output><button type="button" data-inc="${id}" aria-label="Increase">+</button>
       </div></li>`;
