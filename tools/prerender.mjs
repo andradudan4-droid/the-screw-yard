@@ -21,7 +21,7 @@ const pcard = (p) => `<article class="pcard">
   <div class="pcard__body"><h3 class="pcard__name">${esc(p.name)}</h3>
   <p class="pcard__spec">${esc(detail(p))}</p>
   <table class="sizes"><thead><tr><th scope="col">Size (mm)</th><th scope="col">Price ${esc(PRICES[p.id].unit)}</th></tr></thead>
-  <tbody>${PRICES[p.id].sizes.map(([sz, v]) => `<tr><th scope="row">${esc(sz)}</th><td><span class="sizes__ex"><b>${gbp(v)}</b> ex VAT</span><span class="sizes__inc">${gbp(v * 1.2)} inc VAT</span></td></tr>`).join("")}</tbody></table></div>
+  <tbody>${PRICES[p.id].sizes.map(([sz, v]) => `<tr><th scope="row">${esc(sz)}</th><td><span class="sizes__ex"><b>${gbp(v * 1.2)}</b> inc VAT</span><span class="sizes__inc">${gbp(v)} ex VAT</span></td></tr>`).join("")}</tbody></table></div>
 </article>`;
 
 const bin = (p) => `<li class="bin"><div class="bin__img"><img src="${img(p)}" alt="${esc(p.name)}" loading="lazy" decoding="async"></div>

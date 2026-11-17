@@ -34,7 +34,7 @@ function spec(p, c) {
         <div>
           <h2>${esc(p.name)}</h2>
           ${rows ? `<dl>${rows}</dl>` : `<p>Sizes on request.</p>`}
-          ${pr ? `<table class="sizes"><thead><tr><th scope="col">Size (mm)</th><th scope="col">Price ${esc(pr.unit)}</th></tr></thead><tbody>${pr.sizes.map(([sz, v]) => `<tr><th scope="row">${esc(sz)}</th><td><span class="sizes__ex"><b>${gbp(v)}</b> ex VAT</span><span class="sizes__inc">${gbp(v * 1.2)} inc VAT</span></td></tr>`).join("")}</tbody></table>` : ""}
+          ${pr ? `<table class="sizes"><thead><tr><th scope="col">Size (mm)</th><th scope="col">Price ${esc(pr.unit)}</th></tr></thead><tbody>${pr.sizes.map(([sz, v]) => `<tr><th scope="row">${esc(sz)}</th><td><span class="sizes__ex"><b>${gbp(v * 1.2)}</b> inc VAT</span><span class="sizes__inc">${gbp(v)} ex VAT</span></td></tr>`).join("")}</tbody></table>` : ""}
           <a class="spec__go" href="/?aisle=${c.id}">${pr ? "Order in the catalogue" : "Ask for a price in the catalogue"}</a>
         </div>
       </li>`;
@@ -90,7 +90,7 @@ function page(c) {
     <p class="cat__lead">${esc(INTRO[c.id])}</p>
     <p class="cat__lead">This range has ${items.length} lines: ${esc(list(names))}.</p>
     ${GUIDES.filter((g) => g.cats.includes(c.id)).map((g) => `<p class="cat__guide">Guide: <a href="/guides/${g.slug}">${esc(g.title)}</a></p>`).join("\n    ")}
-    <p class="cat__terms">Sold by the box. <b>Free delivery</b> on 5 boxes or more. Prices are shown excluding and including VAT where listed. For everything else, send us your list and we will come back with a price.</p>
+    <p class="cat__terms">Sold by the box. <b>Free delivery</b> on 5 boxes or more. Prices are shown including and excluding VAT where listed. For everything else, send us your list and we will come back with a price.</p>
     <ul class="specs">
       ${items.map((p) => spec(p, c)).join("\n      ")}
     </ul>

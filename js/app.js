@@ -109,7 +109,7 @@ function sizeTable(p) {
     <tbody>${pr.sizes.map(([sz, v]) => {
       const k = esc(keyOf(p.id, sz)), n = quote[keyOf(p.id, sz)] || 0;
       return `<tr${n ? ' class="is-in"' : ""}><th scope="row">${esc(sz)}</th>
-        <td><span class="sizes__ex"><b>${gbp(v)}</b> ex VAT</span><span class="sizes__inc">${gbp(incVat(v))} inc VAT</span></td>
+        <td><span class="sizes__ex"><b>${gbp(incVat(v))}</b> inc VAT</span><span class="sizes__inc">${gbp(v)} ex VAT</span></td>
         <td class="sizes__act">${n
           ? `<span class="qty qty--sm" role="group" aria-label="Boxes of ${esc(sz)}"><button type="button" data-dec="${k}" aria-label="One box fewer">−</button><output>${n}</output><button type="button" data-inc="${k}" aria-label="One box more">+</button></span>`
           : `<button class="btn btn--hivis btn--sm" type="button" data-inc="${k}" aria-label="Add ${esc(sz)} to basket">Add</button>`}</td></tr>`;
@@ -253,7 +253,7 @@ const deliveryLine = (tt) => !tt.boxes ? "" : tt.boxes >= FREE_BOXES ? "Free del
 function quoteText() {
   const lines = Object.entries(quote).map(([k, n]) => {
     const { id, size } = parseKey(k), u = unitPrice(k);
-    return u == null ? `• ${n} x ${byId[id].name} (price on request)` : `• ${n} x ${byId[id].name}, ${size} mm, ${gbp(u * n)} ex VAT`;
+    return u == null ? `• ${n} x ${byId[id].name} (price on request)` : `• ${n} x ${byId[id].name}, ${size} mm, ${gbp(incVat(u * n))} inc VAT`;
   });
   const tt = totals();
   const sum = tt.boxes ? `\n\nSubtotal ex VAT: ${gbp(tt.sub)}\nVAT 20%: ${gbp(tt.vat)}\nTotal inc VAT: ${gbp(tt.total)}\n${tt.boxes >= FREE_BOXES ? `Free delivery (${FREE_BOXES} boxes or more)` : "Delivery: please quote"}` : "";
@@ -273,8 +273,8 @@ function syncQuote() {
     const { id, size } = parseKey(k), p = byId[id], u = unitPrice(k), n = quote[k], kk = esc(k);
     return `<li class="qitem"><img src="${img(p)}" alt="">
       <div><div class="qitem__name">${esc(p.name)}</div>
-        <div class="qitem__unit">${u == null ? "Price on request" : `${esc(size)} mm, ${gbp(u)} ${esc(PRICES[id].unit)} ex VAT`}</div>
-        ${u == null ? "" : `<div class="qitem__line">${gbp(u * n)} <span>ex VAT</span></div>`}</div>
+        <div class="qitem__unit">${u == null ? "Price on request" : `${esc(size)} mm, ${gbp(incVat(u))} ${esc(PRICES[id].unit)} inc VAT`}</div>
+        ${u == null ? "" : `<div class="qitem__line">${gbp(incVat(u * n))} <span>inc VAT</span></div>`}</div>
       <div class="qty" role="group" aria-label="Quantity of ${esc(p.name)}${size ? " " + esc(size) : ""}">
         <button type="button" data-dec="${kk}" aria-label="Decrease">−</button><output>${n}</output><button type="button" data-inc="${kk}" aria-label="Increase">+</button>
       </div></li>`;
