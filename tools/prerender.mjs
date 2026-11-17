@@ -2,6 +2,7 @@
 // without running JavaScript. Run after editing js/data.js:  node tools/prerender.mjs
 import { readFileSync, writeFileSync } from "node:fs";
 import { writeCategoryPages } from "./categories.mjs";
+import { writeGuides } from "./guides.mjs";
 import { PRICES, BRAND, CATEGORIES, PRODUCTS } from "../js/data.js";
 
 const file = new URL("../index.html", import.meta.url);
@@ -67,4 +68,5 @@ s = s.replace(/(<script type="application\/ld\+json">)[\s\S]*?(<\/script>)/, (_,
 s = s.replace(/(<span data-count-products>)\d+(<\/span>)/, `$1${PRODUCTS.length}$2`);
 writeFileSync(file, s);
 writeCategoryPages();
+writeGuides();
 console.log(`${PRODUCTS.length} products written`);
