@@ -89,7 +89,7 @@ ${table(["Deck board", "Screw length", "Diameter"], [
   },
   {
     slug: "self-tapping-vs-self-drilling-screws",
-    title: "Self-tapping or self-drilling screws: which do you need?",
+    title: "Self-tapping vs self-drilling screws",
     desc: "The difference between self-tapping and self-drilling (Tek) screws, what metal thickness each one suits, and which to use for roofing and cladding.",
     answer: "A <b>self-tapping</b> screw cuts its own thread but needs a pilot hole in metal. A <b>self-drilling</b> screw has a drill point, so it makes the hole and the thread in one go.",
     cats: ["self-tapping", "self-drilling"],
@@ -166,7 +166,7 @@ ${table(["Plug", "Drill bit", "Screw diameter"], [
   },
   {
     slug: "screw-sizes-explained",
-    title: "Screw sizes explained: metric, gauge and length",
+    title: "Screw sizes explained: gauge and length",
     desc: "What screw sizes mean, with a gauge to mm conversion chart, inch to mm lengths, pilot hole sizes and how to choose the right length.",
     answer: "A metric screw size is <b>diameter x length in millimetres</b>. A 5 x 80 screw is 5 mm across the thread and 80 mm long.",
     cats: ["wood", "bolts"],
