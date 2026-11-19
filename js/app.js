@@ -12,7 +12,7 @@ const waLink = (text) => `https://wa.me/${BRAND.whatsapp}?text=${encodeURICompon
 
 /* ---------- prices ---------- */
 const VAT_RATE = 0.2;   // prices in data.js are ex VAT
-const FREE_BOXES = 5;   // free delivery from this many boxes
+const FREE_BOXES = 10;   // free delivery from this many boxes
 const incVat = (n) => n * (1 + VAT_RATE);
 const priced = (p) => PRICES[p.id];
 const fromOf = (p) => Math.min(...PRICES[p.id].sizes.map((x) => x[1]));

@@ -271,7 +271,7 @@ ${g.body}
     <section class="cat__cta" aria-labelledby="cta-title">
       <div>
         <h2 id="cta-title">Not sure which fixing?</h2>
-        <p>Tell us the job and we will find the fixing. Sold by the box, free delivery on 5 boxes or more.</p>
+        <p>Tell us the job and we will find the fixing. Sold by the box, free delivery on 10 boxes or more.</p>
       </div>
       <div>
         <a class="btn btn--hivis" href="tel:${BRAND.phoneTel}">Call ${BRAND.phoneDisplay}</a>

@@ -44,7 +44,7 @@ function page(c) {
   const items = PRODUCTS.filter((p) => p.cat === c.id);
   const names = items.map((p) => p.name);
   const url = site + c.slug;
-  const desc = `${c.name} from The Screw Yard in Poole, Dorset: ${list(names.slice(0, 4))}${names.length > 4 ? " and more" : ""}. Sold by the box, free delivery on 5 boxes or more.`;
+  const desc = `${c.name} from The Screw Yard in Poole, Dorset: ${list(names.slice(0, 4))}${names.length > 4 ? " and more" : ""}. Sold by the box, free delivery on 10 boxes or more.`;
   const ld = {
     "@context": "https://schema.org",
     "@graph": [
@@ -90,7 +90,7 @@ function page(c) {
     <p class="cat__lead">${esc(INTRO[c.id])}</p>
     <p class="cat__lead">This range has ${items.length} lines: ${esc(list(names))}.</p>
     ${GUIDES.filter((g) => g.cats.includes(c.id)).map((g) => `<p class="cat__guide">Guide: <a href="/guides/${g.slug}">${esc(g.title)}</a></p>`).join("\n    ")}
-    <p class="cat__terms">Sold by the box. <b>Free delivery</b> on 5 boxes or more. Prices are shown including and excluding VAT where listed. For everything else, send us your list and we will come back with a price.</p>
+    <p class="cat__terms">Sold by the box. <b>Free delivery</b> on 10 boxes or more. Prices are shown including and excluding VAT where listed. For everything else, send us your list and we will come back with a price.</p>
     <ul class="specs">
       ${items.map((p) => spec(p, c)).join("\n      ")}
     </ul>
