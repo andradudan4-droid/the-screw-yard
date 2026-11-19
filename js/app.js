@@ -12,7 +12,7 @@ const waLink = (text) => `https://wa.me/${BRAND.whatsapp}?text=${encodeURICompon
 
 /* ---------- prices ---------- */
 const VAT_RATE = 0.2;   // prices in data.js are ex VAT
-const FREE_BOXES = 10;   // free delivery from this many boxes
+const FREE_OVER = 50;   // free delivery when the order total inc VAT reaches this (£)
 const incVat = (n) => n * (1 + VAT_RATE);
 const priced = (p) => PRICES[p.id];
 const fromOf = (p) => Math.min(...PRICES[p.id].sizes.map((x) => x[1]));
@@ -42,7 +42,7 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(quote)); } c
 
 /* ---------- static bits ---------- */
 $$("[data-count-products]").forEach((el) => (el.textContent = PRODUCTS.length));
-$$("[data-free-boxes]").forEach((el) => (el.textContent = FREE_BOXES));
+$$("[data-free-over]").forEach((el) => (el.textContent = `£${FREE_OVER}`));
 $$("[data-wa-general]").forEach((a) => {
   a.href = waLink(`Hi ${BRAND.name}, I'd like a price on some fixings.`);
   a.target = "_blank"; a.rel = "noopener";
@@ -152,7 +152,7 @@ function render() {
   const dealsHtml = deals.length ? `<section class="aisle deals" id="aisle-priced" aria-labelledby="t-priced">
       <header class="deals__head">
         <div><h2 class="aisle__title" id="t-priced">Ready to order</h2><p class="aisle__blurb">Priced per box. Pick your size and add it to your basket.</p></div>
-        <p class="deals__offer"><b>Free delivery</b> on ${FREE_BOXES} boxes or more</p>
+        <p class="deals__offer"><b>Free delivery</b> on orders over £${FREE_OVER}</p>
       </header>
       <div class="pcards">${deals.map(pcard).join("")}</div></section>` : "";
   $("#results").innerHTML = dealsHtml + CATEGORIES.map((c, i) => {
@@ -202,7 +202,7 @@ function openProduct(id) {
           ${priced(p) ? `<button class="btn btn--hivis" type="button" data-basket>View basket</button>` : `<button class="btn btn--hivis" type="button" data-add="${p.id}" aria-pressed="${inQ}">${inQ ? "✓ In basket" : "+ Add to basket"}</button>`}
           <a class="btn btn--wa" target="_blank" rel="noopener" href="${waLink(`Hi ${BRAND.name}, I'm interested in: ${p.name}. Can you give me a price?`)}">Ask on WhatsApp</a>
         </div>
-        <p class="pd__note">${priced(p) ? `Free delivery on ${FREE_BOXES} boxes or more. Need a different size? Contact us for details.` : "Tell us the size, finish and quantity you need and we will send you a price."}</p>
+        <p class="pd__note">${priced(p) ? `Free delivery on orders over £${FREE_OVER}. Need a different size? Contact us for details.` : "Tell us the size, finish and quantity you need and we will send you a price."}</p>
       </div>
     </div>`;
   pdlg.showModal();
@@ -248,7 +248,8 @@ function totals() {
   for (const [k, n] of Object.entries(quote)) { const u = unitPrice(k); if (u == null) ask += 1; else { sub += u * n; boxes += n; } }
   return { sub, vat: sub * VAT_RATE, total: incVat(sub), boxes, ask };
 }
-const deliveryLine = (tt) => !tt.boxes ? "" : tt.boxes >= FREE_BOXES ? "Free delivery" : `Add ${FREE_BOXES - tt.boxes} more box${FREE_BOXES - tt.boxes === 1 ? "" : "es"} for free delivery`;
+const isFree = (tt) => tt.total >= FREE_OVER;
+const deliveryLine = (tt) => !tt.boxes ? "" : isFree(tt) ? "Free delivery" : `Add ${gbp(FREE_OVER - tt.total)} more for free delivery`;
 
 function quoteText() {
   const lines = Object.entries(quote).map(([k, n]) => {
@@ -256,7 +257,7 @@ function quoteText() {
     return u == null ? `• ${n} x ${byId[id].name} (price on request)` : `• ${n} x ${byId[id].name}, ${size} mm, ${gbp(incVat(u * n))} inc VAT`;
   });
   const tt = totals();
-  const sum = tt.boxes ? `\n\nSubtotal ex VAT: ${gbp(tt.sub)}\nVAT 20%: ${gbp(tt.vat)}\nTotal inc VAT: ${gbp(tt.total)}\n${tt.boxes >= FREE_BOXES ? `Free delivery (${FREE_BOXES} boxes or more)` : "Delivery: please quote"}` : "";
+  const sum = tt.boxes ? `\n\nSubtotal ex VAT: ${gbp(tt.sub)}\nVAT 20%: ${gbp(tt.vat)}\nTotal inc VAT: ${gbp(tt.total)}\n${isFree(tt) ? `Free delivery (over £${FREE_OVER})` : "Delivery: please quote"}` : "";
   const note = $("#qnote").value.trim();
   return `Hi ${BRAND.name}, I'd like to order:\n\n${lines.join("\n")}${sum}${note ? `\n\nNotes: ${note}` : ""}\n\nThanks!`;
 }
@@ -282,7 +283,7 @@ function syncQuote() {
   const d = deliveryLine(tt);
   $("#qtotals").hidden = !tt.boxes;
   $("#qtotals").innerHTML = !tt.boxes ? "" : `
-    <p class="qdel ${tt.boxes >= FREE_BOXES ? "is-free" : ""}">${esc(d)}</p>
+    <p class="qdel ${isFree(tt) ? "is-free" : ""}">${esc(d)}</p>
     <dl class="qsum">
       <div><dt>Subtotal, ex VAT</dt><dd>${gbp(tt.sub)}</dd></div>
       <div><dt>VAT at 20%</dt><dd>${gbp(tt.vat)}</dd></div>
