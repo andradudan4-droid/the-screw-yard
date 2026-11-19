@@ -15,11 +15,11 @@
 export const PRICES = {
   "csk-chipboard": {
     unit: "per box",
-    sizes: [["4 x 50", 12], ["5 x 60", 9], ["5 x 80", 8], ["5 x 100", 9], ["6 x 120", 9]],
+    sizes: [["4 x 50", 4.75], ["5 x 60", 4.75], ["5 x 80", 4.75], ["5 x 100", 4.75], ["6 x 120", 4.75]],
   },
   "coarse-thread-drywall": {
     unit: "per box",
-    sizes: [["3.5 x 35", 10]],
+    sizes: [["3.5 x 25", 5.5]],
   },
 };
 
