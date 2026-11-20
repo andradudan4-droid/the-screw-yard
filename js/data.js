@@ -18,8 +18,8 @@ export const PRICES = {
     sizes: [["4 x 50", 9.5], ["5 x 60", 8.5], ["5 x 80", 7.1], ["5 x 100", 5.9], ["6 x 120", 4.75]],
   },
   "coarse-thread-drywall": {
-    unit: "per box",
-    sizes: [["3.5 x 25", 5.5]],
+    unit: "per 1 kg box",
+    sizes: [["3.5 x 25", 6.5]],
   },
 };
 
