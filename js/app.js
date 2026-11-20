@@ -326,3 +326,7 @@ if (qa && catById[qa]) showAisle(qa);
 
 // "See all" on a shortened aisle opens that aisle
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-show-aisle]"); if (b) showAisle(b.dataset.showAisle); });
+
+// Shop by category dropdown: close on outside tap or Escape
+document.addEventListener("click", (e) => { $$(".catmenu[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; }); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $$(".catmenu[open]").forEach((d) => { d.open = false; d.querySelector("summary").focus(); }); });

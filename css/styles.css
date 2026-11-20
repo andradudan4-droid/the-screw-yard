@@ -64,9 +64,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .hero__phone:hover { color: var(--hivis); }
 @media (max-width: 1023px) { .hero__phone { display: none; } }
 .hero__top { position: absolute; top: clamp(34px, 5vw, 70px); right: var(--pad); display: flex; align-items: center; gap: 28px; }
-.hero__faq { color: #fff; font-weight: 800; text-decoration: none; border: 2px solid rgba(255,255,255,.35); border-radius: 8px; padding: .45em 1em; line-height: 1.2; }
-.hero__faq:hover { border-color: var(--hivis); color: var(--hivis); }
-@media (max-width: 640px) { .hero__top { top: 44px; } .hero__faq { padding: .35em .75em; font-size: .9rem; } }
+@media (max-width: 640px) { .hero__top { top: 44px; } }
 .hero { position: relative; background: var(--ink); color: #fff; isolation: isolate; padding: clamp(28px, 5vw, 64px) var(--pad) clamp(36px, 5vw, 64px); }
 .hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse at 25% 30%, #000 30%, transparent 78%); -webkit-mask-image: radial-gradient(ellipse at 25% 30%, #000 30%, transparent 78%); }
 .hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
@@ -437,3 +435,29 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .faq__glist { display: flex; flex-direction: column; align-items: flex-start; margin: 0; border-top: 2px solid var(--ink); }
 .faq__glist a { display: block; width: 100%; padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--ink); font-weight: 650; text-decoration: none; }
 .faq__glist a:hover { color: var(--muted); }
+
+/* ---------- Shop by category dropdown (hero) ---------- */
+.hero__top { z-index: 5; }
+.hero:has(.catmenu[open]) { z-index: 40; }
+.catmenu { position: relative; }
+.catmenu__btn { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: .55em; color: #fff; font-weight: 800; border: 2px solid rgba(255,255,255,.35); border-radius: 8px; padding: .5em .95em; line-height: 1.2; user-select: none; }
+.catmenu__btn::-webkit-details-marker { display: none; }
+.catmenu__btn svg { width: 12px; height: 8px; transition: transform .2s; }
+.catmenu[open] .catmenu__btn, .catmenu__btn:hover { border-color: var(--hivis); color: var(--hivis); }
+.catmenu[open] .catmenu__btn svg { transform: rotate(180deg); }
+.catmenu__short { display: none; }
+.catmenu__list { position: absolute; right: 0; top: calc(100% + 8px); min-width: 270px; background: var(--card); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 0 14px 30px rgba(0,0,0,.35); padding: 6px; display: flex; flex-direction: column; }
+.catmenu__list a { color: var(--ink); text-decoration: none; font-weight: 650; padding: 10px 12px; border-radius: 6px; }
+.catmenu__list a:hover, .catmenu__list a:focus-visible { background: var(--hivis); }
+@media (max-width: 640px) {
+  .catmenu__long { display: none; }
+  .catmenu__short { display: inline; }
+  .catmenu__btn { padding: .4em .7em; font-size: .9rem; }
+  .catmenu__list { min-width: 240px; }
+}
+@media (prefers-reduced-motion: reduce) { .catmenu__btn svg { transition: none; } }
+
+/* footer: brand on the left, one FAQ button on the right */
+.footer--home .footer__grid { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+.footer__col--faq .btn { min-width: 140px; }
+@media (max-width: 860px) { .footer--home .footer__grid { grid-template-columns: 1fr; } .footer__brand { grid-column: auto; } }
