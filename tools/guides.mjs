@@ -304,8 +304,8 @@ export function writeGuides() {
   mkdirSync(new URL("guides/", root), { recursive: true });
   for (const g of GUIDES) writeFileSync(new URL(`guides/${g.slug}.html`, root), page(g));
   writeFileSync(new URL("guides/index.html", root), index());
-  const f = new URL("index.html", root);
+  const f = new URL("faq.html", root);
   let s = readFileSync(f, "utf8");
-  s = s.replace(/<!--guides-start-->[\s\S]*?<!--guides-end-->/, () => `<!--guides-start--><a href="/guides/">Fixing guides</a>${GUIDES.map((g) => `<a href="/guides/${g.slug}">${esc(g.title)}</a>`).join("")}<!--guides-end-->`);
+  s = s.replace(/<!--guides-start-->[\s\S]*?<!--guides-end-->/, () => `<!--guides-start--><a href="/guides/">All fixing guides</a>${GUIDES.map((g) => `<a href="/guides/${g.slug}">${esc(g.title)}</a>`).join("")}<!--guides-end-->`);
   writeFileSync(f, s);
 }
