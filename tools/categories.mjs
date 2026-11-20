@@ -112,7 +112,7 @@ function page(c) {
   <footer class="footer">
     <p><b>The Screw Yard</b> · Screws, bolts and fasteners</p>
     <p class="footer__small">The Screw Yard is a trading name of CMD Team Ltd, registered in England and Wales, company number 16231862, VAT number GB 485 7981 21. Registered office: 33 Belben Road, Poole, BH12 4PH. Email: ${BRAND.email}. Images are representative.</p>
-    <p class="footer__links"><a href="/guides/">Guides</a><a href="/terms">Terms of use</a><a href="/privacy">Privacy policy</a><a href="/cookies">Cookies</a></p>
+    <p class="footer__links"><a href="/faq">FAQ</a><a href="/guides/">Guides</a><a href="/terms">Terms of use</a><a href="/privacy">Privacy policy</a><a href="/cookies">Cookies</a></p>
   </footer>
 </body>
 </html>
@@ -128,6 +128,6 @@ export function writeCategoryPages() {
   writeFileSync(f, s);
   // sitemap
   const today = new Date().toISOString().slice(0, 10);
-  const urls = ["", ...CATEGORIES.map((c) => c.slug), "guides/", ...GUIDES.map((g) => "guides/" + g.slug), "terms", "privacy", "cookies"];
+  const urls = ["", ...CATEGORIES.map((c) => c.slug), "guides/", ...GUIDES.map((g) => "guides/" + g.slug), "faq", "terms", "privacy", "cookies"];
   writeFileSync(new URL("sitemap.xml", root), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${site}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 }

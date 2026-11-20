@@ -12,6 +12,7 @@ const waLink = (text) => `https://wa.me/${BRAND.whatsapp}?text=${encodeURICompon
 
 /* ---------- prices ---------- */
 const VAT_RATE = 0.2;   // prices in data.js are ex VAT
+const PER_AISLE = 4;   // products shown per aisle when browsing everything
 const FREE_OVER = 50;   // free delivery when the order total inc VAT reaches this (£)
 const incVat = (n) => n * (1 + VAT_RATE);
 const priced = (p) => PRICES[p.id];
@@ -155,15 +156,19 @@ function render() {
         <p class="deals__offer"><b>Free delivery</b> on orders over £${FREE_OVER}</p>
       </header>
       <div class="pcards">${deals.map(pcard).join("")}</div></section>` : "";
+  const filtered = state.q.trim() || state.use;
+  // Browsing everything: show a few per aisle so the page stays short
+  const preview = !state.cat && !filtered;
   $("#results").innerHTML = dealsHtml + CATEGORIES.map((c, i) => {
     const items = rest.filter((p) => p.cat === c.id);
     if (!items.length) return "";
+    const cut = preview && items.length > PER_AISLE;
+    const more = cut ? `<button class="aisle__more" type="button" data-show-aisle="${c.id}">See all ${items.length} ${esc(c.name.toLowerCase())}</button>` : "";
     return `<section class="aisle" id="aisle-${c.id}" aria-labelledby="t-${c.id}">
       <header class="aisle__head"><span class="aisle__no" aria-hidden="true">${pad(i + 1)}</span>
         <h2 class="aisle__title" id="t-${c.id}">${esc(c.name)}</h2><p class="aisle__blurb">${esc(c.blurb)} <a href="/${c.slug}">Full specs</a></p></header>
-      <ul class="bins">${items.map(bin).join("")}</ul></section>`;
+      <ul class="bins">${(cut ? items.slice(0, PER_AISLE) : items).map(bin).join("")}</ul>${more}</section>`;
   }).join("");
-  const filtered = state.q.trim() || state.use;
   $("#count").textContent = filtered ? `${list.length} of ${PRODUCTS.length} products match` : "";
   $("#empty").hidden = list.length > 0;
   $$("[data-aisle]").forEach((a) => {
@@ -318,3 +323,6 @@ syncQuote();
 // Links from the category pages open the catalogue on that aisle
 const qa = new URLSearchParams(location.search).get("aisle");
 if (qa && catById[qa]) showAisle(qa);
+
+// "See all" on a shortened aisle opens that aisle
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-show-aisle]"); if (b) showAisle(b.dataset.showAisle); });

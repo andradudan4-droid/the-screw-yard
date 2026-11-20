@@ -422,3 +422,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .footer__base { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) { .footer__grid { grid-template-columns: 1fr; } }
+
+.faq-main .faq { min-height: 60vh; padding-top: clamp(36px, 5vw, 64px); }
+.faq-page .faq__title { font-size: clamp(2rem, 5vw, 3.2rem); }
+.aisle__more { display: flex; align-items: center; justify-content: center; gap: .5em; width: 100%; min-height: 48px; margin-top: 12px; padding: .7em 1em; border: 2px solid var(--ink); border-radius: 8px; background: transparent; font-weight: 750; cursor: pointer; }
+.aisle__more:hover { background: var(--ink); color: var(--paper); }
