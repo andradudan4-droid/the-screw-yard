@@ -14,8 +14,8 @@
 // Confirmed prices from the owner. Key = product id, sizes = [size in mm, price in GBP].
 export const PRICES = {
   "csk-chipboard": {
-    unit: "per box",
-    sizes: [["4 x 50", 4.75], ["5 x 60", 4.75], ["5 x 80", 4.75], ["5 x 100", 4.75], ["6 x 120", 4.75]],
+    unit: "per 1 kg box",
+    sizes: [["4 x 50", 9.5], ["5 x 60", 8.5], ["5 x 80", 7.1], ["5 x 100", 5.9], ["6 x 120", 4.75]],
   },
   "coarse-thread-drywall": {
     unit: "per box",
